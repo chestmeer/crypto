@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="manifest.json" />
+
     <title>Crypto Tracker</title>
     <style>
       body {
@@ -120,20 +122,20 @@
       }
 
       /*
-        resetButton.addEventListener('click', () => {
-          allSpans.forEach(function(span) {
-          span.textContent = "xxx";
-        });
-        });
+          resetButton.addEventListener('click', () => {
+            allSpans.forEach(function(span) {
+            span.textContent = "xxx";
+          });
+          });
 
-          downloadCoinsButton1.addEventListener('click', () => {
-          downloadPrices1();
-        });
+            downloadCoinsButton1.addEventListener('click', () => {
+            downloadPrices1();
+          });
 
-        downloadCoinsButton2.addEventListener('click', () => {
-          downloadPrices2();
-        });
-      */
+          downloadCoinsButton2.addEventListener('click', () => {
+            downloadPrices2();
+          });
+        */
 
       function updatePrices(fetchObject) {
         const bitcoinFetchObject = fetchObject.bitcoin;
@@ -188,6 +190,13 @@
           errorMessage.textContent = "Downloading prices failed. Try again";
           console.error(objectError.message);
         }
+      }
+
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then(() => console.log("PWA działa poprawnie!"))
+          .catch((err) => console.log("Błąd PWA:", err));
       }
     </script>
   </body>
