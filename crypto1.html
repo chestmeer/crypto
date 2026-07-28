@@ -1,28 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="eng">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crypto Tracker</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 20px;
+        background-color: white;
+      }
+      .button-group {
+        margin-bottom: 20px;
+        display: block;
+      }
+      button {
+        background-color: aqua;
+        color: black;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      @media (hover: hover) {
+        button:hover {
+          background-color: antiquewhite;
+          cursor: pointer;
+        }
+      }
+      button:active {
+        background-color: antiquewhite;
+      }
+      .crypto-row span {
+        margin-right: 15px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto srypto</title>
-  <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 20px;
-      background-color: white;
-    }
-  </style>
-</head>
+  <body>
+    <h1>coingecko.com</h1>
 
-<body>
-  
-  <h1>To jest naglowek strony</h1>
-  <p>To jest prosta aplikacja webowa do crypto</p>
+    <div class="button-group">
+      <button id="jsResetButton">RESET PRICES</button>
+      <button id="jsDownloadCoinsButton1">
+        Download Coin Prices (async/await)
+      </button>
+      <button id="jsDownloadCoinsButton2">Download Coin Prices (.then)</button>
+    </div>
 
-  <script>
+    <p id="jsErrorMessage" style="color: red; font-weight: bold"></p>
 
-    
-  </script>
-</body>
+    <p class="crypto-row">
+      Bitcoin =
+      <span class="jsBitcoin"></span>
+      <span class="jsBitcoinPln"></span>
+      <span class="jsBitcoinGbp"></span>
+    </p>
 
+    <p class="crypto-row">
+      Ethereum =
+      <span class="jsEthereum"></span>
+      <span class="jsEthereumPln"></span>
+      <span class="jsEthereumGbp"></span>
+    </p>
+
+    <p class="crypto-row">
+      Dogecoin =
+      <span class="jsDogecoin"></span>
+      <span class="jsDogecoinPln"></span>
+      <span class="jsDogecoinGbp"></span>
+    </p>
+
+    <script>
+      const currency = "usd";
+
+      let currencySymbol = "";
+
+      if (currency === "usd") {
+        currencySymbol = "$";
+      } else if (currency === "pln") {
+        currencySymbol = "PLN";
+      }
+
+      const errorMessage = document.querySelector("#jsErrorMessage");
+      const resetButton = document.querySelector("#jsResetButton");
+      const downloadCoinsButton1 = document.querySelector(
+        "#jsDownloadCoinsButton1",
+      );
+      const downloadCoinsButton2 = document.querySelector(
+        "#jsDownloadCoinsButton2",
+      );
+
+      const allSpans = document.querySelectorAll("span");
+
+      const bitcoinSpan = document.querySelector(".jsBitcoin");
+      const bitcoinPlnSpan = document.querySelector(".jsBitcoinPln");
+      const bitcoinGbpSpan = document.querySelector(".jsBitcoinGbp");
+
+      const ethereumSpan = document.querySelector(".jsEthereum");
+      const ethereumPlnSpan = document.querySelector(".jsEthereumPln");
+      const ethereumGbpSpan = document.querySelector(".jsEthereumGbp");
+
+      const dogecoinSpan = document.querySelector(".jsDogecoin");
+      const dogecoinPlnSpan = document.querySelector(".jsDogecoinPln");
+      const dogecoinGbpSpan = document.querySelector(".jsDogecoinGbp");
+
+      const apiUrl =
+        "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,dogecoin&vs_currencies=usd,pln,gbp";
+
+      resetButton.addEventListener("click", resetPrices);
+      downloadCoinsButton1.addEventListener("click", downloadPricesAsync);
+      downloadCoinsButton2.addEventListener("click", downloadPricesThen);
+
+      function resetPrices() {
+        errorMessage.textContent = "";
+        console.log("hello");
+        allSpans.forEach(function (span) {
+          span.textContent = "xxx";
+        });
+      }
+
+      /*
+        resetButton.addEventListener('click', () => {
+          allSpans.forEach(function(span) {
+          span.textContent = "xxx";
+        });
+        });
+
+          downloadCoinsButton1.addEventListener('click', () => {
+          downloadPrices1();
+        });
+
+        downloadCoinsButton2.addEventListener('click', () => {
+          downloadPrices2();
+        });
+      */
+
+      function updatePrices(fetchObject) {
+        const bitcoinFetchObject = fetchObject.bitcoin;
+        const ethereumFetchObject = fetchObject.ethereum;
+        const dogecoinFetchObject = fetchObject.dogecoin;
+
+        bitcoinSpan.textContent = `${bitcoinFetchObject.usd} $`;
+        bitcoinPlnSpan.textContent = `${bitcoinFetchObject.pln} PLN`;
+        bitcoinGbpSpan.textContent = `${bitcoinFetchObject.gbp} GBP`;
+
+        ethereumSpan.textContent = `${ethereumFetchObject.usd} $`;
+        ethereumPlnSpan.textContent = `${ethereumFetchObject.pln} PLN`;
+        ethereumGbpSpan.textContent = `${ethereumFetchObject.gbp} GBP`;
+
+        dogecoinSpan.textContent = `${dogecoinFetchObject.usd} $`;
+        dogecoinPlnSpan.textContent = `${dogecoinFetchObject.pln} PLN`;
+        dogecoinGbpSpan.textContent = `${dogecoinFetchObject.gbp} GBP`;
+      }
+
+      function downloadPricesThen() {
+        errorMessage.textContent = "";
+        fetch(apiUrl)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error(`Error! Status: ${response.status}`);
+            }
+            console.log("Object Response: ", response);
+            return response.json();
+          })
+          .then(function (data) {
+            console.log("Object data: ", data);
+            updatePrices(data);
+          })
+          .catch(function (objectError) {
+            errorMessage.textContent = "Downloading prices failed. Try again";
+            console.error(objectError.message);
+          });
+      }
+
+      async function downloadPricesAsync() {
+        try {
+          errorMessage.textContent = "";
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            throw new Error(`Error! Status: ${response.status}`);
+          }
+          console.log("Object Response: ", response);
+          const data = await response.json();
+          console.log(data);
+          updatePrices(data);
+        } catch (objectError) {
+          errorMessage.textContent = "Downloading prices failed. Try again";
+          console.error(objectError.message);
+        }
+      }
+    </script>
+  </body>
 </html>
